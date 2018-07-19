@@ -48,7 +48,8 @@ export default {
         if (valid) {
           checkUser(this.form).then(res => {
             if (res.meta.status === 400) return this.$message.error(res.meta.msg)
-            this.$router.push({name: 'Home'})
+            localStorage.xxtoken = res.data.token
+            this.$router.push({ name: 'Home' })
           })
         } else {
           console.log('信息填写不完整!!')

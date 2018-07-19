@@ -1,39 +1,47 @@
 <template>
     <div class="login">
-        <el-form ref="form" :model="form" class="container">
+        <el-form ref="form" :model="form" :rules="rules" class="container">
             <el-form-item>
                 <div class="avatar"></div>
             </el-form-item>
-            <el-form-item>
+            <el-form-item prop="username">
                 <el-input v-model="form.username" prefix-icon="xxicon xxicon-user" placeholder="账户"></el-input>
             </el-form-item>
-            <el-form-item>
+            <el-form-item prop="password">
                 <el-input v-model="form.password" prefix-icon="xxicon xxicon-key" placeholder="密码"></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" class="login-btn">主要按钮</el-button>
+                <el-button type="info" class="login-btn">Login</el-button>
             </el-form-item>
         </el-form>
     </div>
 </template>
 <script>
 export default {
-  data() {
+  data () {
     return {
       form: {
-        username: "",
-        password: ""
+        username: '',
+        password: ''
+      },
+      rules: {
+        username: [
+          { required: true, message: '请输入用户名', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' }
+        ]
       }
-    };
+    }
   }
-};
+}
 </script>
 <style lang="scss" scoped>
 .login {
   position: fixed;
   width: 100%;
   height: 100%;
-  background-color: #2f4050;
+  background-color: #32383d;
 
   .container {
     position: absolute;
@@ -43,6 +51,8 @@ export default {
     padding: 0px 40px 15px 40px;
     margin: 200px auto;
     background: white;
+    border-radius: 5px;
+    box-shadow: 0 0 30px rgba(0,0,0,.1);
     .avatar {
       position: relative;
       left: 50%;
@@ -55,6 +65,7 @@ export default {
       border: 10px solid #fff;
       box-shadow: 0 1px 5px #ccc;
       overflow: hidden;
+      background: url(../assets/avatar.gif) no-repeat center /cover;
     }
     .login-btn {
       width: 100%;

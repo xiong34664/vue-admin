@@ -21,7 +21,8 @@
 
                 </el-input>
                 <el-button type="success"
-                           plain="">添加用户</el-button>
+                           plain
+                           @click="addDialog = true">添加用户</el-button>
             </el-col>
 
         </el-row>
@@ -55,15 +56,18 @@
                     <el-button size="mini"
                                plain
                                type="primary"
-                               icon="el-icon-edit"></el-button>
+                               icon="el-icon-edit"
+                               @click="getUser(scoped.row.id)"></el-button>
                     <el-button size="mini"
                                plain
                                type="danger"
-                               icon="el-icon-delete"></el-button>
+                               icon="el-icon-delete"
+                               @click="deleteUser(scoped.row.id)"></el-button>
                     <el-button size="mini"
                                plain
                                type="warning"
-                               icon="el-icon-check"></el-button>
+                               icon="el-icon-check"
+                               @click="showGrantDialog(scoped.row)"></el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -73,7 +77,7 @@
                     <el-pagination @size-change="handleSizeChange"
                                    @current-change="handleCurrentChange"
                                    :current-page="currentPage"
-                                   :page-sizes="[1, 3, 5, 7]"
+                                   :page-sizes="[3, 5, 10, 20]"
                                    :page-size="pagesize"
                                    layout="total, sizes, prev, pager, next, jumper"
                                    :total="total">
@@ -82,11 +86,92 @@
 
             </el-col>
         </el-row>
+
+        <!-- 添加用户对话框 -->
+        <el-dialog title="新增用户"
+                   :visible.sync="addDialog">
+            <el-form :model="addUser"
+                     :rules="rules"
+                     ref="addForm"
+                     label-width="80px">
+                <el-form-item label="用户名"
+                              prop="username">
+                    <el-input v-model="addUser.username"></el-input>
+                </el-form-item>
+                <el-form-item label="密码"
+                              prop="password">
+                    <el-input v-model="addUser.password"
+                              type="password"></el-input>
+                </el-form-item>
+                <el-form-item label="邮箱"
+                              prop="email">
+                    <el-input v-model="addUser.email"></el-input>
+                </el-form-item>
+                <el-form-item label="电话">
+                    <el-input v-model="addUser.mobile"
+                              @keyup.native.enter="addUserSubmit('addForm')"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer"
+                 class="dialog-footer">
+                <el-button @click="addDialog = false">取 消</el-button>
+                <el-button type="primary"
+                           @click="addUserSubmit">确 定</el-button>
+            </div>
+        </el-dialog>
+        <!-- 编辑用户对话框 -->
+        <el-dialog title="编辑用户"
+                   :visible.sync="editDialog">
+            <el-form :model="editUser"
+                     :rules="rules"
+                     ref="editForm"
+                     label-width="80px">
+                <el-form-item label="用户名">
+                    <el-input v-model="editUser.username"
+                              :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="邮箱"
+                              prop="email">
+                    <el-input v-model="editUser.email"></el-input>
+                </el-form-item>
+                <el-form-item label="电话">
+                    <el-input v-model="editUser.mobile"
+                              @keyup.native.enter="editUserSubmit('editForm')"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer"
+                 class="dialog-footer">
+                <el-button @click="editDialog = false">取 消</el-button>
+                <el-button type="primary"
+                           @click="editUserSubmit">确 定</el-button>
+            </div>
+        </el-dialog>
+
+        <!-- 角色分配 -->
+        <el-dialog title="分配角色"
+                   :visible.sync="grantDialog">
+            <el-form :model="grantForm" label-width="120px">
+                <el-form-item label="当前用户">
+                   <el-tag type="danger" closable>{{grantForm.username}}</el-tag>
+                </el-form-item>
+                <el-form-item label="请选择角色">
+                    <el-select v-model="rolesId" placeholder="请选择角色">
+                        <el-option v-for="(item,index) in roles" :key="index" :label="item.roleName" :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <div slot="footer"
+                 class="dialog-footer">
+                <el-button @click="grantDialog = false">取 消</el-button>
+                <el-button type="primary"
+                           @click="grantUserSubmit">确 定</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
 <script>
-import { getUserList, changeUserStates } from '@/api'
+import { getUserList, changeUserStates, addUser, getUserById, editUser, delUser, getRoles, grantUserRole } from '@/api'
 export default {
   methods: {
     handleSizeChange (val) {
@@ -111,6 +196,78 @@ export default {
         if (res.meta.status === 400) return this.$message.error(res.meta.msg)
         this.$message.success(res.meta.msg)
       })
+    },
+    getUser (id) {
+      getUserById(id).then(res => {
+        if (res.meta.status === 400) return this.$message.error(res.meta.msg)
+        this.editUser.id = res.data.id
+        this.editUser.username = res.data.username
+        this.editUser.email = res.data.email
+        this.editUser.mobile = res.data.mobile
+        this.editDialog = true
+      })
+    },
+    addUserSubmit () {
+      this.$refs.addForm.validate((valid) => {
+        if (valid) {
+          addUser(this.addUser).then(res => {
+            if (res.meta.status === 400) return this.$message.error(res.meta.msg)
+            this.$message.success(res.meta.msg)
+            this.addDialog = false
+            this.initList()
+            this.addUser = {
+              username: '',
+              password: '',
+              email: '',
+              mobile: ''
+            }
+          })
+        }
+      })
+    },
+    editUserSubmit () {
+      this.$refs.editForm.validate((valid) => {
+        if (valid) {
+          editUser(this.editUser).then(res => {
+            if (res.meta.status === 400) return this.$message.error(res.meta.msg)
+            this.$message.success(res.meta.msg)
+            this.editDialog = false
+            this.initList()
+          })
+        }
+      })
+    },
+    deleteUser (id) {
+      this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        delUser(id).then(res => {
+          if (res.meta.status === 400) return this.$message.error(res.meta.msg)
+          this.$message.success(res.meta.msg)
+          this.initList()
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    },
+    showGrantDialog (row) {
+      this.grantForm = row
+      this.grantDialog = true
+      getRoles().then(res => {
+        this.roles = res.data
+      })
+    },
+    grantUserSubmit () {
+      grantUserRole({id: this.grantForm.id, rid: this.rolesId}).then(res => {
+        if (res.meta.status === 400) return this.$message.error(res.meta.msg)
+        this.$message.success(res.meta.msg)
+        this.grantDialog = false
+      })
     }
   },
   created () {
@@ -123,7 +280,33 @@ export default {
       searchVal: '',
       total: 0,
       pagesize: 3,
-      pagenum: 1
+      pagenum: 1,
+      addDialog: false,
+      editDialog: false,
+      grantDialog: false,
+      addUser: {
+        username: '',
+        password: '',
+        email: '',
+        mobile: ''
+      },
+      editUser: {
+        id: '',
+        username: '',
+        email: '',
+        mobile: ''
+      },
+      grantForm: {
+        username: '',
+        roles: ''
+      },
+      roles: '',
+      rolesId: '',
+      rules: {
+        username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+        password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+        email: [{ type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }]
+      }
     }
   }
 }

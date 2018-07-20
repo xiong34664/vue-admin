@@ -28,3 +28,27 @@ export const getUserList = params => {
 export const changeUserStates = params => {
   return axios.put(`users/${params.uid}/state/${params.type}`).then(res => res.data)
 }
+// 更改用户状态
+export const addUser = params => {
+  return axios.post('users', params).then(res => res.data)
+}
+// 编辑用户信息
+export const getUserById = id => {
+  return axios.get(`users/${id}`).then(res => res.data)
+}
+// 编辑用户信息
+export const editUser = params => {
+  return axios.put(`users/${params.id}`, params).then(res => res.data)
+}
+// 删除用户
+export const delUser = id => {
+  return axios.delete(`users/${id}`).then(res => res.data)
+}
+// 获取角色列表
+export const getRoles = id => {
+  return axios.get('roles').then(res => res.data)
+}
+// 分配角色
+export const grantUserRole = params => {
+  return axios.put(`users/${params.id}/role`, { id: params.id, rid: params.rid }).then(res => res.data)
+}

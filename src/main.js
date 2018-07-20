@@ -5,6 +5,8 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 
+import store from '@/store/store'
+
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
@@ -20,7 +22,7 @@ router.beforeEach((to, from, next) => {
     // 登陆了就放行
     next()
     if (to.path === '/login') {
-      next({ path: '/home' })
+      next({ path: '/' })
     }
   } else if (to.path !== '/login') {
     next({ path: '/login' })
@@ -37,5 +39,6 @@ new Vue({
   components: {
     App
   },
-  template: '<App/>'
+  template: '<App/>',
+  store
 })

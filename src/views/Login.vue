@@ -49,6 +49,7 @@ export default {
           checkUser(this.form).then(res => {
             if (res.meta.status === 400) return this.$message.error(res.meta.msg)
             localStorage.xxtoken = res.data.token
+            this.$store.commit('setUser', res.data.username)
             this.$router.push({ name: 'Home' })
           })
         } else {

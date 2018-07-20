@@ -3,7 +3,7 @@
         <el-container>
             <el-aside width="auto">
                 <div class="logo"></div>
-                <el-menu default-active="1-1"
+                <el-menu
                          class="el-menu-admin"
                          :collapse='isCollapse'
                          :router='true'>
@@ -13,7 +13,7 @@
                             <span>用户管理</span>
                         </template>
                         <el-menu-item-group>
-                            <el-menu-item index="1-1">
+                            <el-menu-item index="users">
                                 <i class="el-icon-location"></i>用户列表</el-menu-item>
                         </el-menu-item-group>
                     </el-submenu>
@@ -55,6 +55,7 @@
                                target="_blank">订单管理</a>
                         </el-menu-item>
                     </el-menu>
+                    <div><span>你好,{{$store.getters.username}}</span></div>
                     <el-button type="text"
                                @click="logout">退出登录</el-button>
 
@@ -91,6 +92,7 @@ export default {
     logout () {
       // 清除登入状态即保存在 localStorage中的token
       localStorage.removeItem('xxtoken')
+      localStorage.removeItem('username')
       // 跳转到登录页面
       this.$router.push({ name: 'Login' })
     }

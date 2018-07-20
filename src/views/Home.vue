@@ -13,7 +13,7 @@
                             <span>用户管理</span>
                         </template>
                         <el-menu-item-group>
-                            <el-menu-item index="users">
+                            <el-menu-item index="user">
                                 <i class="el-icon-location"></i>用户列表</el-menu-item>
                         </el-menu-item-group>
                     </el-submenu>

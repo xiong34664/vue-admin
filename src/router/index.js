@@ -16,9 +16,10 @@ export default new Router({
     },
     {
       path: '/',
+      // name: 'Home',
       component: Home,
       children: [
-        {name: 'Default', path: '/', redirect: {name: 'Main'}},
+        {path: '/', redirect: {name: 'Main'}},
         {name: 'Main', path: 'main', component: Main},
         {name: 'User', path: 'user', component: User}
       ]

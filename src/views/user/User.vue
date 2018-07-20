@@ -14,10 +14,10 @@
                 <el-input placeholder="请输入内容"
                           class="search-input"
                           v-model="searchVal"
-                          @keyup.native.enter="init">
+                          @keyup.native.enter="initList">
                     <el-button slot="append"
                                icon="el-icon-search"
-                               @click="init"></el-button>
+                               @click="initList"></el-button>
 
                 </el-input>
                 <el-button type="success"
@@ -43,7 +43,8 @@
             </el-table-column>
             <el-table-column label="用户状态">
                 <template slot-scope="scoped">
-                    <el-switch v-model="value"
+                    <el-switch v-model="scoped.row.mg_state"
+                               @change="changeUserState(scoped.row)"
                                active-color="#13ce66"
                                inactive-color="#ff4949">
                     </el-switch>
@@ -85,7 +86,7 @@
 </template>
 
 <script>
-import { getUserList } from '@/api'
+import { getUserList, changeUserStates } from '@/api'
 export default {
   methods: {
     handleSizeChange (val) {
@@ -95,7 +96,6 @@ export default {
     handleCurrentChange (val) {
       this.pagenum = val
       this.initList()
-      console.log(`当前页: ${val}`)
     },
     initList () {
       let params = { params: { query: this.searchVal, pagenum: this.pagenum, pagesize: this.pagesize } }
@@ -103,6 +103,13 @@ export default {
         if (res.meta.status === 400) return this.$message('暂无数据')
         this.userList = res.data.users
         this.total = res.data.total
+      })
+    },
+    changeUserState (row) {
+      let params = { uid: row.id, type: row.mg_state }
+      changeUserStates(params).then(res => {
+        if (res.meta.status === 400) return this.$message.error(res.meta.msg)
+        this.$message.success(res.meta.msg)
       })
     }
   },
@@ -113,7 +120,6 @@ export default {
     return {
       userList: [],
       currentPage: 1,
-      value: true,
       searchVal: '',
       total: 0,
       pagesize: 3,

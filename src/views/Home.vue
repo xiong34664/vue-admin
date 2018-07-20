@@ -69,21 +69,12 @@
     </div>
 </template>
 <script>
-import { getUserList } from '@/api'
 export default {
   data () {
     return {
       activeIndex: '1',
-      isCollapse: false,
-      userList: []
+      isCollapse: false
     }
-  },
-  mounted () {
-    let params = { params: { query: '', pagenum: 1, pagesize: 5 } }
-    getUserList(params).then(res => {
-      if (res.meta.status === 400) return this.$message('暂无数据')
-      this.userList = res.data
-    })
   },
   methods: {
     toggleCollapse () {
@@ -124,7 +115,6 @@ $color: #409eff;
   .logo {
     height: 60px;
     background: #fff url(../assets/logo.png) no-repeat center / contain;
-    // background-size: cover;
   }
   .toggle-btn {
     padding: 0 10px;

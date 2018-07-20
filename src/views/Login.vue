@@ -16,7 +16,7 @@
         <el-input v-model="form.password"
                   type="password"
                   prefix-icon="xxicon xxicon-key"
-                  placeholder="密码"></el-input>
+                  placeholder="密码" @keyup.native.enter="loginSubmit('form')"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button type="info"

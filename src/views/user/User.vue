@@ -12,9 +12,12 @@
         <el-row>
             <el-col :span="24">
                 <el-input placeholder="请输入内容"
-                          class="search-input">
+                          class="search-input"
+                          v-model="searchVal"
+                          @keyup.native.enter="init">
                     <el-button slot="append"
-                               icon="el-icon-search"></el-button>
+                               icon="el-icon-search"
+                               @click="init"></el-button>
 
                 </el-input>
                 <el-button type="success"
@@ -22,19 +25,45 @@
             </el-col>
 
         </el-row>
-        <el-table :data="tableData"
+        <el-table :data="userList"
                   border
                   style="width: 100%">
-            <el-table-column prop="date"
-                             label="日期"
+            <el-table-column type="index"
+                             width="50"></el-table-column>
+            <el-table-column prop="username"
+                             label="用户名"
                              width="180">
             </el-table-column>
-            <el-table-column prop="name"
-                             label="姓名"
+            <el-table-column prop="email"
+                             label="邮箱"
                              width="180">
             </el-table-column>
-            <el-table-column prop="address"
-                             label="地址">
+            <el-table-column prop="mobile"
+                             label="电话">
+            </el-table-column>
+            <el-table-column label="用户状态">
+                <template slot-scope="scoped">
+                    <el-switch v-model="value"
+                               active-color="#13ce66"
+                               inactive-color="#ff4949">
+                    </el-switch>
+                </template>
+            </el-table-column>
+            <el-table-column label="操作">
+                <template slot-scope="scoped">
+                    <el-button size="mini"
+                               plain
+                               type="primary"
+                               icon="el-icon-edit"></el-button>
+                    <el-button size="mini"
+                               plain
+                               type="danger"
+                               icon="el-icon-delete"></el-button>
+                    <el-button size="mini"
+                               plain
+                               type="warning"
+                               icon="el-icon-check"></el-button>
+                </template>
             </el-table-column>
         </el-table>
         <el-row>
@@ -43,10 +72,10 @@
                     <el-pagination @size-change="handleSizeChange"
                                    @current-change="handleCurrentChange"
                                    :current-page="currentPage"
-                                   :page-sizes="[100, 200, 300, 400]"
-                                   :page-size="100"
+                                   :page-sizes="[1, 3, 5, 7]"
+                                   :page-size="pagesize"
                                    layout="total, sizes, prev, pager, next, jumper"
-                                   :total="400">
+                                   :total="total">
                     </el-pagination>
                 </div>
 
@@ -56,35 +85,39 @@
 </template>
 
 <script>
+import { getUserList } from '@/api'
 export default {
   methods: {
     handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
+      this.pagesize = val
+      this.initList()
     },
     handleCurrentChange (val) {
+      this.pagenum = val
+      this.initList()
       console.log(`当前页: ${val}`)
+    },
+    initList () {
+      let params = { params: { query: this.searchVal, pagenum: this.pagenum, pagesize: this.pagesize } }
+      getUserList(params).then(res => {
+        if (res.meta.status === 400) return this.$message('暂无数据')
+        this.userList = res.data.users
+        this.total = res.data.total
+      })
     }
+  },
+  created () {
+    this.initList()
   },
   data () {
     return {
-      tableData: [{
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-      }, {
-        date: '2016-05-04',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1517 弄'
-      }, {
-        date: '2016-05-01',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄'
-      }, {
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄'
-      }],
-      currentPage: 1
+      userList: [],
+      currentPage: 1,
+      value: true,
+      searchVal: '',
+      total: 0,
+      pagesize: 3,
+      pagenum: 1
     }
   }
 }

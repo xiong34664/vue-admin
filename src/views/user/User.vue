@@ -28,6 +28,7 @@
         </el-row>
         <el-table :data="userList"
                   border
+                  v-loading="loading"
                   style="width: 100%">
             <el-table-column type="index"
                              width="50"></el-table-column>
@@ -152,7 +153,7 @@
                    :visible.sync="grantDialog">
             <el-form :model="grantForm" label-width="120px">
                 <el-form-item label="当前用户">
-                   <el-tag type="danger" closable>{{grantForm.username}}</el-tag>
+                   <el-tag type="danger">{{grantForm.username}}</el-tag>
                 </el-form-item>
                 <el-form-item label="请选择角色">
                     <el-select v-model="rolesId" placeholder="请选择角色">
@@ -183,11 +184,13 @@ export default {
       this.initList()
     },
     initList () {
+      this.loading = true
       let params = { params: { query: this.searchVal, pagenum: this.pagenum, pagesize: this.pagesize } }
       getUserList(params).then(res => {
         if (res.meta.status === 400) return this.$message('暂无数据')
         this.userList = res.data.users
         this.total = res.data.total
+        this.loading = false
       })
     },
     changeUserState (row) {
@@ -256,10 +259,14 @@ export default {
       })
     },
     showGrantDialog (row) {
-      this.grantForm = row
-      this.grantDialog = true
-      getRoles().then(res => {
-        this.roles = res.data
+      getUserById(row.id).then(res => {
+        if (res.meta.status === 400) return this.$message.error(res.meta.msg)
+        this.rolesId = res.data.rid
+        this.grantForm = row
+        this.grantDialog = true
+        getRoles().then(res => {
+          if (res.meta.status === 200) this.roles = res.data
+        })
       })
     },
     grantUserSubmit () {
@@ -267,6 +274,7 @@ export default {
         if (res.meta.status === 400) return this.$message.error(res.meta.msg)
         this.$message.success(res.meta.msg)
         this.grantDialog = false
+        this.initList()
       })
     }
   },
@@ -284,6 +292,7 @@ export default {
       addDialog: false,
       editDialog: false,
       grantDialog: false,
+      loading: true,
       addUser: {
         username: '',
         password: '',

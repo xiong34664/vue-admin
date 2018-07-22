@@ -16,10 +16,12 @@
         <el-input v-model="form.password"
                   type="password"
                   prefix-icon="xxicon xxicon-key"
-                  placeholder="密码" @keyup.native.enter="loginSubmit('form')"></el-input>
+                  placeholder="密码"
+                  @keyup.native.enter="loginSubmit('form')"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="info"
+        <el-button type="primary"
+        plain
                    class="login-btn"
                    @click="loginSubmit('form')">Login</el-button>
       </el-form-item>
@@ -63,32 +65,37 @@ export default {
 </script>
 <style lang="scss" scoped>
 .login {
-  position: fixed;
+  position: relative;
   width: 100%;
   height: 100%;
-  background-color: #32383d;
-
+  background: url(../assets/architectural-architectural-design-architecture-1029614.png) no-repeat center /cover;
   .container {
+    width: 280px;
+    padding: 28px 40px 10px;
     position: absolute;
-    left: 0;
-    right: 0;
-    width: 400px;
-    padding: 0px 40px 15px 40px;
-    margin: 200px auto;
+    right: 100px;
+    top: 50%;
+    transform: translateY(-50%);
     background: white;
-    border-radius: 5px;
-    box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+    background-image: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
+    // border-radius: 5px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+    transition: all 1s ease;
+    &:hover{
+      box-shadow: 0px 6px 20px rgba(20, 20, 20, 0.13);
+      transform: translateY(-50.5%) translateY(-10px);
+    }
     .avatar {
       position: relative;
       left: 50%;
       width: 120px;
       height: 120px;
       margin-left: -60px;
-      margin-top: -60px;
+      // margin-top: -60px;
       box-sizing: border-box;
       border-radius: 50%;
       border: 10px solid #fff;
-      box-shadow: 0 1px 5px #ccc;
+      box-shadow: 0 0 0px 7px rgba(255, 255, 255, 0.6),0 0 0px 14px rgba(255, 255, 255, 0.4);
       overflow: hidden;
       background: url(../assets/avatar.gif) no-repeat center / cover;
     }

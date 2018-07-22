@@ -261,7 +261,7 @@ export default {
     showGrantDialog (row) {
       getUserById(row.id).then(res => {
         if (res.meta.status === 400) return this.$message.error(res.meta.msg)
-        this.rolesId = res.data.rid
+        this.rolesId = res.data.rid === -1 ? '' : res.data.rid
         this.grantForm = row
         this.grantDialog = true
         getRoles().then(res => {

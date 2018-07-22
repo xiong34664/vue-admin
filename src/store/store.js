@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 const state = {
-  username: 'xxx'
+  username: localStorage.username ? localStorage.username : 'xxx'
 }
 
 const mutations = {
@@ -13,9 +13,7 @@ const mutations = {
   }
 }
 const actions = {}
-const getters = {
-  username: state => localStorage.username
-}
+const getters = {}
 export default new Vuex.Store({
   state,
   getters,

@@ -43,7 +43,7 @@
              @click="toggleCollapse"></i>
           <el-dropdown>
             <span class="el-dropdown-link">
-              {{$store.getters.username}}
+              {{$store.state.username}}
               <i class="el-icon-arrow-down el-icon--right"></i>
             </span>
             <el-dropdown-menu slot="dropdown">
@@ -89,6 +89,9 @@ $color: #409eff;
 .home {
   height: 100%;
   background-color: #e5e5e5;
+  .el-menu{
+    border-right: none;
+  }
   .el-menu-admin:not(.el-menu--collapse) {
     width: 200px;
     min-height: 400px;

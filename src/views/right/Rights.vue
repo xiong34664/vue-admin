@@ -12,13 +12,11 @@
         <el-table :data="rightList"
                   border
                   height="490"
-                  v-loading="loading"
-                  style="width: 100%">
+                  v-loading="loading">
             <el-table-column type="index"
                              width="50"></el-table-column>
             <el-table-column prop="authName"
-                             label="权限名称"
-                             width="180">
+                             label="权限名称">
             </el-table-column>
             <el-table-column prop="path"
                              label="路径">
@@ -26,25 +24,6 @@
             <el-table-column label="层级">
                 <template slot-scope="scoped">
                    <span>{{scoped.row.level | fmtLevel}}</span>
-                </template>
-            </el-table-column>
-            <el-table-column label="操作">
-                <template slot-scope="scoped">
-                    <el-button size="mini"
-                               plain
-                               type="primary"
-                               icon="el-icon-edit"
-                               @click="getUser(scoped.row.id)"></el-button>
-                    <el-button size="mini"
-                               plain
-                               type="danger"
-                               icon="el-icon-delete"
-                               @click="deleteUser(scoped.row.id)"></el-button>
-                    <el-button size="mini"
-                               plain
-                               type="warning"
-                               icon="el-icon-check"
-                               @click="showGrantDialog(scoped.row)"></el-button>
                 </template>
             </el-table-column>
         </el-table>

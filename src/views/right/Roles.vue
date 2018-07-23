@@ -13,6 +13,7 @@
       <el-col :span="24"
               class="add-input">
         <el-button type="primary"
+                   @click="dialogAddRole = true"
                    plain>添加角色</el-button>
       </el-col>
     </el-row>
@@ -73,11 +74,13 @@
           <el-button size="mini"
                      plain
                      type="primary"
-                     icon="el-icon-edit"></el-button>
+                     icon="el-icon-edit"
+                     @click="showEditDialog(scoped.row)"></el-button>
           <el-button size="mini"
                      plain
                      type="danger"
-                     icon="el-icon-delete"></el-button>
+                     icon="el-icon-delete"
+                     @click="delRole(scoped.row.id)"></el-button>
           <el-tooltip class="item"
                       effect="light"
                       content="授权角色"
@@ -104,27 +107,86 @@
       <div slot="footer"
            class="dialog-footer">
         <el-button @click="dialogRoleRight = false">取 消</el-button>
-        <el-button type="primary" @click="submitGrant">确 定</el-button>
+        <el-button type="primary"
+                   @click="submitGrant">确 定</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog title="添加角色"
+               :visible.sync="dialogAddRole">
+      <el-form :model="roleForm"
+               :rules="rules"
+               ref="roleForm"
+               label-width="120px">
+        <el-form-item label="角色名称"
+                      prop="roleName">
+          <el-input v-model="roleForm.roleName"></el-input>
+        </el-form-item>
+        <el-form-item label="角色描述">
+          <el-input v-model="roleForm.roleDesc"
+                    @keyup.native.enter="addSubmitRole"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer"
+           class="dialog-footer">
+        <el-button @click="dialogAddRole = false">取 消</el-button>
+        <el-button type="primary"
+                   @click="addSubmitRole">确 定</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog title="编辑角色"
+               :visible.sync="dialogEditRole">
+      <el-form :model="editForm"
+               :rules="rules"
+               ref="editForm"
+               label-width="120px">
+        <el-form-item label="角色名称"
+                      prop="roleName">
+          <el-input v-model="editForm.roleName"></el-input>
+        </el-form-item>
+        <el-form-item label="角色描述">
+          <el-input v-model="editForm.roleDesc"
+                    @keyup.native.enter="editSubmitRole"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer"
+           class="dialog-footer">
+        <el-button @click="dialogEditRole = false">取 消</el-button>
+        <el-button type="primary"
+                   @click="editSubmitRole">确 定</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getRoles, delRoleRight, getRightList, grantRoleRight } from '@/api'
+import { getRoles, delRoleRight, getRightList, grantRoleRight, addRole, deleteRole, editRole } from '@/api'
 export default {
   data () {
     return {
       roleList: [],
       loading: true,
       dialogRoleRight: false,
+      dialogAddRole: false,
+      dialogEditRole: false,
       data: [],
       defaultProps: {
         children: 'children',
         label: 'authName'
       },
       selectedRights: [],
-      currentRole: {}
+      currentRole: {},
+      roleForm: {
+        roleName: '',
+        roleDesc: ''
+      },
+      editForm: {
+        roleName: '',
+        roleDesc: ''
+      },
+      currentRoleId: null,
+      rules: {
+        roleName: [{ required: true, message: '请输入角色名称', trigger: 'blur' }]
+      }
     }
   },
   created () {
@@ -170,15 +232,64 @@ export default {
       })
     },
     submitGrant () {
-      let rids = this.$refs.tree.getCheckedKeys().join()
-      grantRoleRight(this.currentRole.id, {rids}).then(res => {
+      let rids = this.$refs.tree.getCheckedKeys().toString()
+      grantRoleRight(this.currentRole.id, { rids }).then(res => {
         if (res.meta.status === 400) return this.$message.error(res.meta.msg)
         this.$message.success(res.meta.msg)
         this.dialogRoleRight = false
         this.initRolesList()
       })
+    },
+    addSubmitRole () {
+      this.$refs.roleForm.validate((valid) => {
+        if (valid) {
+          addRole(this.roleForm).then(res => {
+            if (res.meta.status === 400) return this.$message.error(res.meta.msg)
+            this.$message.success(res.meta.msg)
+            this.dialogAddRole = false
+            this.roleForm.roleName = ''
+            this.roleForm.roleDesc = ''
+            this.initRolesList()
+          })
+        }
+      })
+    },
+    delRole (id) {
+      this.$confirm('此操作将永久删除该角色, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteRole(id).then(res => {
+          if (res.meta.status === 400) return this.$message.error(res.meta.msg)
+          this.$message.success(res.meta.msg)
+          this.initRolesList()
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    },
+    showEditDialog (row) {
+      this.editForm.roleName = row.roleName
+      this.editForm.roleDesc = row.roleDesc
+      this.currentRoleId = row.id
+      this.dialogEditRole = true
+    },
+    editSubmitRole () {
+      this.$refs.editForm.validate((valid) => {
+        if (valid) {
+          editRole(this.currentRoleId, this.editForm).then(res => {
+            if (res.meta.status === 400) return this.$message.error(res.meta.msg)
+            this.$message.success('编辑成功')
+            this.dialogEditRole = false
+            this.initRolesList()
+          })
+        }
+      })
     }
-
   }
 }
 </script>

@@ -1,40 +1,22 @@
 <template>
   <div class="home">
-    <el-container>
+    <el-container v-loading="loading">
       <el-aside width="auto">
         <div class="logo"></div>
         <el-menu class="el-menu-admin"
                  :collapse='isCollapse'
                  :unique-opened='true'
                  :router='true'>
-          <el-submenu index="1">
+          <el-submenu v-for="first in menuList" :key="first.id" :index="first.order+''">
             <template slot="title">
               <i class="el-icon-location"></i>
-              <span>用户管理</span>
+              <span>{{first.authName}}</span>
             </template>
-            <el-menu-item-group>
-              <el-menu-item index="user">
-                <i class="el-icon-tickets"></i>用户列表</el-menu-item>
+            <el-menu-item-group v-for="second in first.children" :key="second.id">
+              <el-menu-item :index="second.path">
+                <i class="el-icon-tickets"></i>{{second.authName}}</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
-          <el-submenu index="2">
-            <template slot="title">
-              <i class="el-icon-menu"></i>
-              <span>权限管理</span>
-            </template>
-            <el-menu-item-group>
-              <el-menu-item index="roles">
-                <i class="el-icon-tickets"></i>角色列表
-              </el-menu-item>
-              <el-menu-item index="rights">
-                <i class="el-icon-tickets"></i>权限列表
-              </el-menu-item>
-            </el-menu-item-group>
-          </el-submenu>
-          <el-menu-item index="3">
-            <i class="el-icon-setting"></i>
-            <span slot="title">导航四</span>
-          </el-menu-item>
         </el-menu>
       </el-aside>
       <el-container>
@@ -62,12 +44,21 @@
   </div>
 </template>
 <script>
+import {getMenus} from '@/api'
 export default {
   data () {
     return {
       activeIndex: '1',
-      isCollapse: false
+      isCollapse: false,
+      menuList: [],
+      loading: true
     }
+  },
+  created () {
+    getMenus().then(res => {
+      if (res.meta.status === 200) this.menuList = res.data
+      this.loading = false
+    })
   },
   methods: {
     toggleCollapse () {

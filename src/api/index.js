@@ -64,3 +64,19 @@ export const delRoleRight = params => {
 export const grantRoleRight = (roleId, rids) => {
   return axios.post(`roles/${roleId}/rights`, rids).then(res => res.data)
 }
+// 添加角色
+export const addRole = (params) => {
+  return axios.post('roles', params).then(res => res.data)
+}
+// 删除角色
+export const deleteRole = (id) => {
+  return axios.delete(`roles/${id}`).then(res => res.data)
+}
+// 编辑角色
+export const editRole = (id, params) => {
+  return axios.put(`roles/${id}`, params).then(res => res.data)
+}
+// 编辑角色
+export const getMenus = () => {
+  return axios.get('menus').then(res => res.data)
+}

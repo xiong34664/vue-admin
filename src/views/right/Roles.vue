@@ -20,6 +20,7 @@
     <el-table :data="roleList"
               v-loading="loading"
               border
+              height="450"
               style="width: 100%">
       <el-table-column type="expand">
         <template slot-scope="scoped">

@@ -80,3 +80,23 @@ export const editRole = (id, params) => {
 export const getMenus = () => {
   return axios.get('menus').then(res => res.data)
 }
+// 获取商品分类信息
+export const getCategories = (params) => {
+  return axios.get('categories', { params }).then(res => res.data)
+}
+// 添加商品分类
+export const addCategories = (params) => {
+  return axios.post('categories', params).then(res => res.data)
+}
+// 删除商品分类
+export const delCategories = (id) => {
+  return axios.delete(`categories/${id}`).then(res => res.data)
+}
+// 获取单个商品分类
+export const getCategorie = (id) => {
+  return axios.get(`categories/${id}`).then(res => res.data)
+}
+// 编辑商品分类
+export const editCategories = (id, params) => {
+  return axios.put(`categories/${id}`, params).then(res => res.data)
+}
